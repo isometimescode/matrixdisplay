@@ -1,0 +1,65 @@
+{
+    "version": "2.0.0",
+    "inputs": [
+        {
+            "id": "animationModule",
+            "type": "pickString",
+            "description": "Which animation to run?",
+            "options": [
+                "scroll_horizontal",
+                "stinky_pool",
+                "rv_arrival",
+                "camp_logo"
+            ],
+            "default": "camp_logo"
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Run daemon",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python",
+            "args": ["-m", "daemon.run"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run animation (pick)",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python",
+            "args": ["-m", "animations.${input:animationModule}"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run current animation file",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/bin/python",
+            "args": ["-m", "animations.${fileBasenameNoExtension}"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
