@@ -1,8 +1,9 @@
-"""RV arrival, step 1: a boxy RV drives left-to-right across the panel.
+"""RV arrival: a boxy RV drives left-to-right with turning wheels, while
+big background trees drift the other way.
 
-This is just the shape and movement -- no wheel rotation, tree reveals, or
-growing sign yet (see SETUP.md's Content plan; those are separate
-sub-steps layered on top of this one).
+See animations/welcome_sign.py for the growing "Welcome to Stinky
+Springs" sign -- it was originally the final phase of this animation, but
+split out for reconsideration (see that module's docstring).
 
 Run standalone with the emulator (no hardware, no daemon needed):
     python -m animations.rv_arrival
@@ -10,7 +11,7 @@ Run standalone with the emulator (no hardware, no daemon needed):
 
 from RGBMatrixEmulator import graphics
 
-FRAME_DELAY = 0.08
+FRAME_DELAY = 0.09
 # No DURATION set -- the drive-by finishes on its own once the RV clears
 # the right edge, same as the horizontal text scroll.
 
@@ -75,6 +76,27 @@ HEADLIGHT_HEIGHT = 2
 WHEEL_BACK_X = 4
 WHEEL_FRONT_X = BOX_WIDTH + (CAB_WIDTH - WHEEL_SIZE) // 2
 
+# Pixels of travel per spoke swap -- ties the "turn" to distance driven
+# rather than wall-clock time, so it reads as rolling instead of flickering
+# in place.
+WHEEL_TOGGLE_INTERVAL = 2
+
+TREE_TRUNK_COLOR = graphics.Color(90, 60, 35)
+TREE_LEAF_COLOR = graphics.Color(40, 120, 55)
+TREE_WIDTH = 10
+TREE_TRUNK_HEIGHT = 5
+# Leaves fill nearly the full panel height -- just the trunk and a
+# 1-pixel gap at the very top are left out.
+TREE_TOP_MARGIN = 1
+
+# Trees are background scenery, not roadside markers the RV reaches: they
+# drift right-to-left, opposite the RV's left-to-right drive, which reads
+# as passing scenery rather than a static backdrop.
+TREE_SPEED = 1
+# Frame indices (0 = the moment the RV enters at the left edge) at which
+# each tree spawns off the right edge and starts drifting.
+TREE_SPAWN_FRAMES = (0, 14, 33, 49, 70)
+
 
 def _fill_rect(canvas, x, y, width, height, color):
     for row in range(height):
@@ -91,16 +113,37 @@ def _draw_rect_outline(canvas, x, y, width, height, color):
         canvas.SetPixel(x + width - 1, y + row, color.red, color.green, color.blue)
 
 
-def _draw_wheel(canvas, x, y):
-    # A lighter cross-shaped hub in the middle of the tire, rather than a
-    # flat-colored disc.
+def _draw_wheel(canvas, x, y, spoke_frame):
+    # Two alternating hub shapes -- a "+" and an "x" -- stand in for
+    # rotation; there aren't enough pixels for the real thing.
     for row in range(WHEEL_SIZE):
         for col in range(WHEEL_SIZE):
-            color = HUB_COLOR if row in (1, 2) or col in (1, 2) else WHEEL_COLOR
+            if spoke_frame == 0:
+                is_hub = row in (1, 2) or col in (1, 2)
+            else:
+                is_hub = row == col or row + col == WHEEL_SIZE - 1
+            color = HUB_COLOR if is_hub else WHEEL_COLOR
             canvas.SetPixel(x + col, y + row, color.red, color.green, color.blue)
 
 
-def _draw_rv(canvas, x, height):
+def _draw_tree(canvas, x, height):
+    # A short trunk under a full-height triangular canopy -- a simple
+    # conifer silhouette, tapering from a point at the top to full width
+    # just above the trunk.
+    trunk_top = height - TREE_TRUNK_HEIGHT
+    trunk_left = x + (TREE_WIDTH - 1) // 2
+    _fill_rect(canvas, trunk_left, trunk_top, 1, TREE_TRUNK_HEIGHT, TREE_TRUNK_COLOR)
+
+    canopy_height = trunk_top - TREE_TOP_MARGIN
+    for row in range(canopy_height):
+        row_width = 1 + (TREE_WIDTH - 1) * row // (canopy_height - 1)
+        inset = (TREE_WIDTH - row_width) // 2
+        _fill_rect(
+            canvas, x + inset, TREE_TOP_MARGIN + row, row_width, 1, TREE_LEAF_COLOR
+        )
+
+
+def _draw_rv(canvas, x, height, spoke_frame):
     wheel_top = height - WHEEL_SIZE
     box_top = wheel_top - BOX_HEIGHT
     cab_top = wheel_top - CAB_HEIGHT
@@ -144,18 +187,31 @@ def _draw_rv(canvas, x, height):
     )
 
     for wheel_x in (WHEEL_BACK_X, WHEEL_FRONT_X):
-        _draw_wheel(canvas, x + wheel_x, wheel_top)
+        _draw_wheel(canvas, x + wheel_x, wheel_top, spoke_frame)
 
 
 def run(canvas, width, height):
     # Start fully off the left edge, end fully off the right edge.
     x = -RV_WIDTH
+    frame_index = 0
     while x < width:
         canvas.Clear()
-        _draw_rv(canvas, x, height)
+
+        # Trees are drawn behind the RV, so the RV occludes any it's
+        # currently overlapping.
+        for spawn_frame in TREE_SPAWN_FRAMES:
+            if frame_index < spawn_frame:
+                continue
+            tree_x = width - TREE_SPEED * (frame_index - spawn_frame)
+            if tree_x > -TREE_WIDTH:
+                _draw_tree(canvas, tree_x, height)
+
+        spoke_frame = (x // WHEEL_TOGGLE_INTERVAL) % 2
+        _draw_rv(canvas, x, height, spoke_frame)
         canvas = yield canvas
 
         x += 1
+        frame_index += 1
 
 
 if __name__ == "__main__":

@@ -9,7 +9,8 @@
                 "scroll_horizontal",
                 "stinky_pool",
                 "rv_arrival",
-                "camp_logo"
+                "camp_logo",
+                "welcome_sign"
             ],
             "default": "camp_logo"
         }
