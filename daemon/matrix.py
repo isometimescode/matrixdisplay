@@ -2,9 +2,9 @@
 the daemon and every animation agree on them."""
 
 try:
-    from rgbmatrix import RGBMatrix, RGBMatrixOptions
+    from rgbmatrix import RGBMatrix, RGBMatrixOptions, graphics  # noqa: F401
 except ImportError:
-    from RGBMatrixEmulator import RGBMatrix, RGBMatrixOptions
+    from RGBMatrixEmulator import RGBMatrix, RGBMatrixOptions, graphics  # noqa: F401
 
 WIDTH, HEIGHT = 64, 32
 

@@ -9,7 +9,7 @@ Run standalone with the emulator (no hardware, no daemon needed):
     python -m animations.rv_arrival
 """
 
-from RGBMatrixEmulator import graphics
+from daemon.matrix import graphics
 
 FRAME_DELAY = 0.09
 # No DURATION set -- the drive-by finishes on its own once the RV clears

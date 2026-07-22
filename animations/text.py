@@ -1,6 +1,6 @@
 """Shared helpers for drawing BDF bitmap fonts via the `graphics` module."""
 
-from RGBMatrixEmulator import graphics
+from daemon.matrix import graphics
 
 
 def load_font(path):

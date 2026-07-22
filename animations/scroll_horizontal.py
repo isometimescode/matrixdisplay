@@ -11,7 +11,7 @@ Run standalone with the emulator (no hardware, no daemon needed):
 
 from pathlib import Path
 
-from RGBMatrixEmulator import graphics
+from daemon.matrix import graphics
 
 from animations.text import centered_y, load_font, text_pixel_width
 
