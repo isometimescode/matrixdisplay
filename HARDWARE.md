@@ -26,6 +26,15 @@ Use the `adafruit-hat` hardware mapping to match the bonnet's wiring.
 
 - **Onboard audio must be disabled.** It shares hardware timers with the
   matrix library and causes visible flicker if left on.
+- **GPIO timing needs slowing down on faster Pis.** The library's default
+  GPIO write speed outruns what the panel can reliably latch on a Pi 3 B+,
+  causing visible flicker/ghosting especially at the panel's edges. Fixed
+  with `options.gpio_slowdown = 2` in `daemon/matrix.py`.
+- **Killing the driver process mid-frame freezes the panel**, since its
+  refresh thread dies with it, leaving the LEDs on whatever half-drawn
+  multiplexed frame was in progress. `daemon/run.py` handles `SIGTERM`/
+  `SIGINT` by clearing the canvas before exiting -- don't `kill -9` it, use
+  a normal `kill`/`systemctl stop` so that handler gets to run.
 - **The driver process needs root/low-level GPIO access.** Keep it as a
   separate, privileged process from anything web-facing (see the daemon/
   web app split in the main [README](README.md)).

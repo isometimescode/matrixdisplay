@@ -4,8 +4,9 @@ A Raspberry Pi 3 B+ driving an Adafruit 64x32 RGB LED matrix panel: plays a
 sequence of animations, controllable from a web UI. Built to run in an RV,
 so it needs to work without always being on a known network.
 
-**Status: early development.** The LED matrix hardware is still in transit;
-the software here is still being built out.
+**Status: running.** The daemon drives the real panel on the Pi via a
+systemd service (`matrixdisplay-daemon`, enabled at boot). The web control
+UI isn't built yet.
 
 ## How it works
 
