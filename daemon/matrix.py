@@ -14,4 +14,5 @@ def build_matrix():
     options.rows = HEIGHT
     options.cols = WIDTH
     options.hardware_mapping = "adafruit-hat"
+    options.gpio_slowdown = 2
     return RGBMatrix(options=options)
