@@ -1,0 +1,15 @@
+[Unit]
+Description=matrixdisplay web control UI
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/matrixdisplay
+ExecStart=/home/pi/matrixdisplay/.venv/bin/python -m web.run
+Restart=on-failure
+RestartSec=2
+User=pi
+Group=matrixdisplay
+
+[Install]
+WantedBy=multi-user.target

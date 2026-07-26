@@ -15,12 +15,12 @@ import signal
 import sys
 from collections import deque
 
-from animations import camp_logo, rv_arrival, stinky_pool
+from animations import camp_logo, rv_arrival, stinky_pool, unicorn_trail
 from daemon.matrix import HEIGHT, WIDTH, build_matrix
 from daemon.player import play_one
 
 
-SEQUENCE = [camp_logo, rv_arrival, stinky_pool]
+SEQUENCE = [camp_logo, unicorn_trail, rv_arrival, stinky_pool]
 
 
 def main():
