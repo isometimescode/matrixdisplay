@@ -14,7 +14,7 @@ def text_pixel_width(font, text):
 
 
 def centered_y(font, height):
-    """Baseline y that vertically centers one line of text within `height`
-    pixels. DrawText's y argument is the baseline, not the top of the
-    text, so this centers the font's box, then shifts down by baseline."""
+    """Baseline y that centers one line of text within `height` pixels --
+    DrawText's y is the baseline, not the top, so this centers the font's
+    box then shifts down by baseline."""
     return (height - font.height) // 2 + font.baseline

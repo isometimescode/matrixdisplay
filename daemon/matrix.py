@@ -1,6 +1,8 @@
 """Shared matrix setup -- the one place panel dimensions are defined, so
 the daemon and every animation agree on them."""
 
+# Real hardware library if installed (the Pi), the software emulator
+# otherwise (any other machine).
 try:
     from rgbmatrix import RGBMatrix, RGBMatrixOptions, graphics  # noqa: F401
 except ImportError:

@@ -1,11 +1,6 @@
 """The main daemon loop: cycles through SEQUENCE by default, playing
-manually queued picks first when there are any.
-
-A manual pick (eventually from the web UI) just gets appended to
-manual_queue -- it plays once, then the sequence resumes on its own from
-wherever it already was. No explicit "resume" action, and no way to pin
-an animation indefinitely, by design -- see SETUP.md's Daemon design
-section for the reasoning.
+manually queued picks first when there are any -- a manual pick plays
+once, then the sequence resumes where it left off.
 
 Run against the emulator:
     python -m daemon.run

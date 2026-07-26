@@ -2,19 +2,15 @@
 canvas so animations only have to decide what to draw.
 
 Each animation module exposes `run(canvas, width, height)`: a generator
-that does one-time setup, then repeatedly draws a frame and does
-`canvas = yield canvas`. That round-trip matters on real hardware: the
-matrix library double-buffers, so `SwapOnVSync` can hand back a *different*
-canvas object each time. Without feeding that back in, the animation would
-keep drawing onto a buffer that's no longer the offscreen one. `send()` is
-what delivers the fresh canvas back into the generator.
+that does setup, then repeatedly does `canvas = yield canvas`. That
+round-trip matters on real hardware -- the matrix double-buffers, so
+`SwapOnVSync` can hand back a different canvas object each time, and
+`send()` is what feeds it back into the generator.
 
-Infinite animations (nothing ever stops the loop) and finite ones (a
-scroll that completes one pass and returns) look identical to `play_one`:
-it just keeps pulling frames until the generator stops on its own, or a
-DURATION cap is hit, whichever comes first. The cap only matters for
-animations with no natural end -- a module can set its own DURATION to
-override the default below.
+`play_one` just keeps pulling frames until the generator stops on its
+own or a DURATION cap is hit, whichever comes first. The cap only
+matters for animations with no natural end; a module can override the
+default below with its own DURATION.
 """
 
 import time

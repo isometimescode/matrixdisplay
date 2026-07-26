@@ -1,6 +1,6 @@
 # matrixdisplay
 
-A Raspberry Pi 3 B+ driving an Adafruit 64x32 RGB LED matrix panel: plays a
+A Raspberry Pi 3 driving an Adafruit 64x32 RGB LED matrix panel: plays a
 sequence of animations, controllable from a web UI. Built to run in an RV,
 so it needs to work without always being on a known network.
 
@@ -27,8 +27,8 @@ See [HARDWARE.md](HARDWARE.md) for the parts list and wiring.
 
 ## Usage
 
-Coming soon — this section will cover installing dependencies, running the
-daemon and web app, and using the control UI, once they exist.
+Coming soon -- covers installing dependencies, running the daemon and web
+app, and using the control UI, once they exist.
 
 ## Development
 
@@ -38,8 +38,8 @@ Python bindings, using its `RGBMatrixEmulator` companion for
 hardware-free development. See [HARDWARE.md](HARDWARE.md) for details on
 the target hardware.
 
-Requires Python 3.13.5 (pinned in `.python-version` to match the Pi; use
-`pyenv` if you have it, or install that version yourself).
+Uses the Python version pinned in `.python-version` to match the Pi; use
+`pyenv` if you have it, or install that version yourself.
 
 ```
 python3 -m venv .venv
@@ -61,11 +61,11 @@ duration cap, for quick iteration:
 python -m animations.camp_logo
 ```
 
-(swap in `scroll_horizontal`, `stinky_pool`, or `rv_arrival` for any of
-the others). Then open <http://localhost:8888> in a browser to watch it.
-(The emulator's `browser` adapter serves the display over HTTP — no
-desktop environment needed, which also means this works unchanged if you
-run it on the Pi itself and view it from your laptop's browser instead.)
+(swap in any other option from `animations`). A pygame window pops up showing
+the animation. (`emulator_config.json` sets `display_adapter: pygame`;
+switch it to `browser` to serve the display over HTTP at
+<http://localhost:8888> instead — useful for running on the Pi itself
+without a desktop environment, viewed from your laptop's browser.)
 
 If you use VS Code, `.vscode/tasks.json` has ready-made tasks for both of
 the above ("Run daemon" and "Run animation (pick)").

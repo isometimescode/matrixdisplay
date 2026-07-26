@@ -1,15 +1,9 @@
-"""Welcome sign: "Welcome to Stinky Springs" text, pre-rendered once at its
-native size and then blitted back with nearest-neighbor scaling at a
-growing fraction of that size each frame -- it reads as the sign growing
-into view, staying crisp at every size since it's never re-rendered at a
-different resolution. Holds briefly at full size before finishing.
+"""Welcome sign: text pre-rendered once at its native size, then blitted
+back with nearest-neighbor scaling at a growing fraction of that size
+each frame -- reads as the sign growing into view. Holds briefly at full
+size before finishing.
 
-Split out of rv_arrival.py, where it was originally the final phase of the
-RV drive-by -- the effect didn't read the way that animation called for,
-so it lives here to reconsider on its own (e.g. paired with rv_arrival in
-the daemon's queue, or standalone).
-
-Run standalone with the emulator (no hardware, no daemon needed):
+Run standalone:
     python -m animations.welcome_sign
 """
 
@@ -17,13 +11,13 @@ from pathlib import Path
 
 from daemon.matrix import graphics
 
+from animations.drawing import fill_rect
 from animations.text import load_font, text_pixel_width
 
 FRAME_DELAY = 0.09
 # No DURATION set -- finishes on its own once the hold period ends.
 
-# Split across three short lines rather than "Stinky Springs" on one line
-# -- at this font size that line alone is wider than the panel.
+# Split across lines that fit the panel's width at this font size.
 TEXT_LINES = ["Welcome to", "Stinky", "Springs"]
 TEXT_COLOR = graphics.Color(215, 205, 165)  # parchment/sign-ish cream
 LINE_GAP = 1
@@ -37,9 +31,8 @@ HOLD_FRAMES = 25
 
 
 class _PixelBuffer:
-    """Minimal canvas-like object -- just enough for graphics.DrawText to
-    render into -- so the sign can be pre-rendered off-screen once, instead
-    of being redrawn at each frame's scale directly."""
+    """Minimal canvas-like object -- just enough for DrawText to render
+    into -- so the sign can be pre-rendered off-screen once."""
 
     def __init__(self, width):
         self.width = width
@@ -78,9 +71,8 @@ def _draw_sign(canvas, pixels, sign_width, sign_height, scale, width, height):
         x1 = origin_x + round((sx + 1) * scale)
         y0 = origin_y + round(sy * scale)
         y1 = origin_y + round((sy + 1) * scale)
-        for y in range(y0, max(y0 + 1, y1)):
-            for x in range(x0, max(x0 + 1, x1)):
-                canvas.SetPixel(x, y, r, g, b)
+        color = graphics.Color(r, g, b)
+        fill_rect(canvas, x0, y0, max(1, x1 - x0), max(1, y1 - y0), color)
 
 
 def run(canvas, width, height):

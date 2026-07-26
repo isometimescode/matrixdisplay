@@ -1,16 +1,15 @@
 """Stinky pool: an oval pond off to one side, with looping smell lines
-rising and fading above it, and "Stinky Springs / Pop: 13" as static sign
-text on the other side.
+rising and fading above it, and text as static sign on the other side.
 
-Run standalone with the emulator (no hardware, no daemon needed):
+Run standalone:
     python -m animations.stinky_pool
 """
 
-import math
 from pathlib import Path
 
 from daemon.matrix import graphics
 
+from animations.drawing import draw_stink_line, set_pixel
 from animations.text import load_font, text_pixel_width
 
 FRAME_DELAY = 0.05
@@ -22,11 +21,10 @@ MUCK_COLOR = graphics.Color(70, 75, 35)  # brown-green, for texture
 STINK_COLOR = graphics.Color(140, 190, 60)  # sickly green
 TEXT_COLOR = graphics.Color(215, 205, 165)  # parchment/sign-ish cream
 
-# Oval pond, bottom-left, sized to leave the right side free for text.
-# It's cropped to just its top cap -- the lower half is pushed off the
-# bottom edge (see _draw_pool). HIDDEN_HEIGHT shapes the curve: bigger
-# relative to VISIBLE_HEIGHT gives a flatter arc, smaller gives a curve
-# closer to the oval's full-width equator.
+# Oval pond, bottom-left, cropped to its top cap -- the lower half is
+# pushed off the bottom edge (see _draw_pool). HIDDEN_HEIGHT shapes the
+# curve: bigger gives a flatter arc, smaller a curve closer to the
+# oval's full-width equator.
 POOL_X = 1
 POOL_WIDTH = 26
 POOL_VISIBLE_HEIGHT = 7
@@ -38,9 +36,8 @@ NUM_STINK_LINES = 3
 STINK_RISE_HEIGHT = 20
 FRAMES_PER_ROW = 4
 
-TEXT_LINES = ["Stinky", "Springs", "Pop: 13"]
+TEXT_LINES = ["Stinky", "Springs", "Pop: 14"]
 FONT_PATH = Path(__file__).parent / "fonts" / "5x7.bdf"
-# Loaded once at import time -- see scroll_horizontal.py for why.
 FONT = load_font(FONT_PATH)
 
 
@@ -63,34 +60,9 @@ def _draw_pool(canvas, height):
             # Dither between water and muck colors for a murky texture
             # instead of a flat fill.
             color = MUCK_COLOR if (x + y) % 3 == 0 else WATER_COLOR
-            canvas.SetPixel(x, y, color.red, color.green, color.blue)
+            set_pixel(canvas, x, y, color)
 
     return pool_y
-
-
-def _draw_stink_line(canvas, x_base, pool_y, tick, phase_offset):
-    cycle = STINK_RISE_HEIGHT * FRAMES_PER_ROW
-    progress = (tick + phase_offset) % cycle
-    rise = progress / FRAMES_PER_ROW
-
-    for row in range(int(rise) + 1):
-        y = pool_y - row
-        if y < 0:
-            break
-
-        # Wave side to side as it climbs, and fade out near the top of its
-        # rise -- reads as dissipating smoke rather than a static squiggle.
-        wave = math.sin(row * 0.6 + tick * 0.15) * 1.5
-        x = round(x_base + wave)
-
-        fade = max(0.0, 1.0 - row / STINK_RISE_HEIGHT)
-        canvas.SetPixel(
-            x,
-            y,
-            round(STINK_COLOR.red * fade),
-            round(STINK_COLOR.green * fade),
-            round(STINK_COLOR.blue * fade),
-        )
 
 
 def _draw_text(canvas, width, height):
@@ -120,7 +92,10 @@ def run(canvas, width, height):
         for i in range(NUM_STINK_LINES):
             x_base = POOL_X + line_spacing * (i + 1)
             phase_offset = i * (cycle // NUM_STINK_LINES)
-            _draw_stink_line(canvas, x_base, pool_y, tick, phase_offset)
+            draw_stink_line(
+                canvas, x_base, pool_y, tick, phase_offset,
+                STINK_COLOR, STINK_RISE_HEIGHT, FRAMES_PER_ROW,
+            )
 
         _draw_text(canvas, width, height)
 

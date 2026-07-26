@@ -1,7 +1,6 @@
-"""Runs a single animation standalone against the emulator, for the
-`python -m animations.<name>` dev workflow -- no daemon, no sequencing,
-just that one animation looping forever (ignoring DURATION) until you
-Ctrl+C, restarting from the top each time a finite one completes a pass.
+"""Runs one animation standalone via `python -m animations.<name>`: loops
+it forever (ignoring DURATION), restarting from the top each time a
+finite animation completes a pass.
 """
 
 import time
