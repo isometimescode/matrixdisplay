@@ -7,8 +7,8 @@ so it needs to work without always being on a known network.
 **Status: running.** Both the daemon and the web control UI run via
 systemd on the Pi (`matrixdisplay-daemon`, `matrixdisplay-web`; both
 enabled at boot). The web UI can pick which animation plays next, send
-free text to scroll across the panel, or sync the clock animation to
-the phone's time zone; shutdown control isn't built yet.
+free text to scroll across the panel, sync the clock animation to the
+phone's time zone, or shut the Pi down cleanly.
 
 ## How it works
 
@@ -23,7 +23,9 @@ the phone's time zone; shutdown control isn't built yet.
   touch the matrix hardware directly -- picking an animation, or sending
   free text, drops a request into a filesystem inbox (`daemon/inbox.py`)
   that the daemon polls once per loop iteration, at the next natural
-  animation boundary. Shutdown control is planned but not built yet.
+  animation boundary. Shutdown is the one action that bypasses the
+  daemon entirely: the web app calls `sudo shutdown -h now` directly,
+  since there's nothing left to hand off to once the Pi is powering off.
 - Animations can be developed and tested against a software emulator, so
   no physical hardware is required to work on them.
 

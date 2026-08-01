@@ -62,4 +62,5 @@ The bonnet uses GPIO 4 (strobe), 5, 6, 12, 13, 16, 17, 20, 21, 22, 23, 24,
 26, 27 for matrix control/color signals. **GPIO2 and GPIO3 are not used**
 by the bonnet — confirmed free if a physical button (e.g. a shutdown
 button via the `gpio-shutdown` overlay on GPIO3/pin 5) is ever wanted.
-Current plan is a web UI shutdown control instead.
+The web UI's shutdown control (see main [README](README.md)) covers this
+for now; a physical button remains an option later.

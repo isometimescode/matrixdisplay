@@ -97,6 +97,18 @@
       border: none;
       border-top: 1px solid #333;
     }
+    .shutdown-form {
+      max-width: 480px;
+      margin: 2rem auto 0;
+    }
+    .shutdown-form button {
+      font-size: 1rem;
+      padding: 0.75rem;
+      background: #7a2020;
+    }
+    .shutdown-form button:active {
+      background: #571616;
+    }
   </style>
 </head>
 <body>
@@ -132,5 +144,14 @@
     </form>
     {% endfor %}
   </div>
+
+  <form
+    class="shutdown-form"
+    method="post"
+    action="{{ url_for('shutdown') }}"
+    onsubmit="return confirm('Shut down the display? You will need to unplug and replug power to turn it back on.');"
+  >
+    <button type="submit">Shut down</button>
+  </form>
 </body>
 </html>

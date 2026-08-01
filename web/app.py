@@ -5,6 +5,8 @@ Run against the emulator/dev daemon:
     python -m web.run
 """
 
+import subprocess
+
 from flask import Flask, redirect, render_template, request, url_for
 
 from daemon.inbox import MAX_TEXT_LEN, drop_pick, drop_text_pick
@@ -56,5 +58,13 @@ def create_app():
             except ValueError:
                 pass
         return redirect(url_for("index"))
+
+    @app.post("/shutdown")
+    def shutdown():
+        # `pi` has passwordless sudo (Raspberry Pi OS default). Popen, not
+        # run: the response needs to make it back to the browser before
+        # the box actually powers off.
+        subprocess.Popen(["sudo", "shutdown", "-h", "now"])
+        return render_template("shutdown.html")
 
     return app
