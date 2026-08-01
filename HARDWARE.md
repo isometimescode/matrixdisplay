@@ -37,6 +37,15 @@ Use the `adafruit-hat` hardware mapping to match the bonnet's wiring.
 - **The driver process needs root/low-level GPIO access.** Keep it as a
   separate, privileged process from anything web-facing (see the daemon/
   web app split in the main [README](README.md)).
+- **RGBMatrix drops root privileges once the hardware is initialized** --
+  `drop_privileges` defaults to on, dropping from root to user/group
+  `daemon` as soon as `RGBMatrix(options)` returns, via a raw
+  setuid/setgid with no `initgroups()` call (so the process keeps none of
+  its original supplementary groups, only whatever `daemon`'s own primary
+  group is). Anything the daemon needs root for, or needs a specific
+  group's shared access for, has to happen *before* `build_matrix()`
+  returns -- see `daemon/inbox.py`'s `ensure_inbox_dir()` call in
+  `daemon/run.py`'s `main()` for why it's ordered that way.
 
 ## GPIO pin usage (adafruit-hat mapping)
 

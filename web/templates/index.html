@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>matrixdisplay</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 1rem;
+      font-family: system-ui, sans-serif;
+      background: #111;
+      color: #eee;
+    }
+    h1 {
+      font-size: 1.25rem;
+      text-align: center;
+    }
+    .animations {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    button {
+      width: 100%;
+      font-size: 1.25rem;
+      padding: 1.25rem;
+      border: none;
+      border-radius: 0.5rem;
+      background: #2a6f97;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:active {
+      background: #1c4e6b;
+    }
+    button.queued {
+      background: #2f8f4e;
+    }
+    button.queued::after {
+      content: " ✓";
+    }
+  </style>
+</head>
+<body>
+  <h1>Play next...</h1>
+  <div class="animations">
+    {% for name in animations %}
+    <form method="post" action="{{ url_for('play', name=name) }}">
+      <button type="submit" class="{{ 'queued' if name == queued else '' }}">{{ name.replace('_', ' ').title() }}</button>
+    </form>
+    {% endfor %}
+  </div>
+</body>
+</html>

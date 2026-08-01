@@ -4,9 +4,10 @@ A Raspberry Pi 3 driving an Adafruit 64x32 RGB LED matrix panel: plays a
 sequence of animations, controllable from a web UI. Built to run in an RV,
 so it needs to work without always being on a known network.
 
-**Status: running.** The daemon drives the real panel on the Pi via a
-systemd service (`matrixdisplay-daemon`, enabled at boot). The web control
-UI isn't built yet.
+**Status: running.** Both the daemon and the web control UI run via
+systemd on the Pi (`matrixdisplay-daemon`, `matrixdisplay-web`; both
+enabled at boot). The web UI can pick which animation plays next;
+shutdown control and free-text scrolling entry aren't built yet.
 
 ## How it works
 
@@ -17,9 +18,11 @@ UI isn't built yet.
   a `run(canvas, width, height)` generator that yields one frame at a
   time -- the daemon owns frame timing and `SwapOnVSync`, animations only
   decide what to draw.
-- A **web app** will provide a control UI (switch animations, shut down
-  cleanly, etc.) and talk to the daemon rather than touching the matrix
-  hardware directly -- not built yet.
+- A **web app** (`web/`) provides a mobile-first control UI. It doesn't
+  touch the matrix hardware directly -- picking an animation drops a
+  request into a filesystem inbox (`daemon/inbox.py`) that the daemon polls
+  once per loop iteration, at the next natural animation boundary. Shutdown
+  control and free-text scrolling entry are planned but not built yet.
 - Animations can be developed and tested against a software emulator, so
   no physical hardware is required to work on them.
 
@@ -27,8 +30,16 @@ See [HARDWARE.md](HARDWARE.md) for the parts list and wiring.
 
 ## Usage
 
-Coming soon -- covers installing dependencies, running the daemon and web
-app, and using the control UI, once they exist.
+Install dependencies (see [Development](#development) below), then run the
+daemon and web app as separate processes:
+
+```
+python -m daemon.run
+python -m web.run
+```
+
+The web app serves the control UI at <http://localhost:8080> (or the host's
+LAN address, from a phone).
 
 ## Development
 

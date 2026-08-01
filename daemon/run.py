@@ -11,14 +11,21 @@ import sys
 from collections import deque
 
 from animations import camp_logo, rv_arrival, stinky_pool, unicorn_trail
+from daemon.inbox import drain_picks, ensure_inbox_dir
 from daemon.matrix import HEIGHT, WIDTH, build_matrix
 from daemon.player import play_one
 
 
 SEQUENCE = [camp_logo, unicorn_trail, rv_arrival, stinky_pool]
+MODULES_BY_NAME = {module.__name__.rsplit(".", 1)[-1]: module for module in SEQUENCE}
 
 
 def main():
+    # Must happen before build_matrix(): RGBMatrix drops root privileges
+    # once the hardware is initialized, and the dropped-to user can't
+    # create this directory itself.
+    ensure_inbox_dir()
+
     matrix = build_matrix()
     canvas = matrix.CreateFrameCanvas()
 
@@ -36,6 +43,9 @@ def main():
     sequence_index = 0
 
     while True:
+        for name in drain_picks(MODULES_BY_NAME.keys()):
+            manual_queue.append(MODULES_BY_NAME[name])
+
         if manual_queue:
             module = manual_queue.popleft()
         else:

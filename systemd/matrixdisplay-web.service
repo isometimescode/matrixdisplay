@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/home/pi/matrixdisplay
+Environment=MATRIXDISPLAY_INBOX_DIR=/run/matrixdisplay/inbox
 ExecStart=/home/pi/matrixdisplay/.venv/bin/python -m web.run
 Restart=on-failure
 RestartSec=2
