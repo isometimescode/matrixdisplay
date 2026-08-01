@@ -6,18 +6,36 @@ Run against the emulator:
     python -m daemon.run
 """
 
+import functools
 import signal
 import sys
 from collections import deque
+from types import SimpleNamespace
 
-from animations import camp_logo, rv_arrival, stinky_pool, unicorn_trail
+from animations import (
+    camp_logo,
+    clock,
+    rv_arrival,
+    scroll_horizontal,
+    stinky_pool,
+    unicorn_trail,
+)
 from daemon.inbox import drain_picks, ensure_inbox_dir
 from daemon.matrix import HEIGHT, WIDTH, build_matrix
 from daemon.player import play_one
 
 
-SEQUENCE = [camp_logo, unicorn_trail, rv_arrival, stinky_pool]
+SEQUENCE = [camp_logo, unicorn_trail, rv_arrival, stinky_pool, clock]
 MODULES_BY_NAME = {module.__name__.rsplit(".", 1)[-1]: module for module in SEQUENCE}
+
+
+def _text_pick(text):
+    """A module-like object that plays scroll_horizontal with custom
+    text, so play_one can treat it the same as any other animation."""
+    return SimpleNamespace(
+        run=functools.partial(scroll_horizontal.run, text=text),
+        FRAME_DELAY=scroll_horizontal.FRAME_DELAY,
+    )
 
 
 def main():
@@ -43,8 +61,11 @@ def main():
     sequence_index = 0
 
     while True:
-        for name in drain_picks(MODULES_BY_NAME.keys()):
-            manual_queue.append(MODULES_BY_NAME[name])
+        for kind, value in drain_picks(MODULES_BY_NAME.keys()):
+            if kind == "name":
+                manual_queue.append(MODULES_BY_NAME[value])
+            else:
+                manual_queue.append(_text_pick(value))
 
         if manual_queue:
             module = manual_queue.popleft()

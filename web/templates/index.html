@@ -42,10 +42,89 @@
     button.queued::after {
       content: " ✓";
     }
+    .text-form {
+      max-width: 480px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .text-form input {
+      flex: 1;
+      font-size: 1.1rem;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.5rem;
+      background: #222;
+      color: #eee;
+    }
+    .text-form button {
+      width: auto;
+      padding: 0.75rem 1.25rem;
+      background: #7a3fa0;
+    }
+    .text-form button:active {
+      background: #55296e;
+    }
+    .tz-form {
+      max-width: 480px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    .tz-form button {
+      width: auto;
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      background: #444;
+    }
+    .tz-form button:active {
+      background: #333;
+    }
+    .confirmation {
+      max-width: 480px;
+      margin: -0.75rem auto 1.5rem;
+      text-align: center;
+      color: #9fd8b3;
+      font-size: 0.9rem;
+    }
+    hr {
+      max-width: 480px;
+      margin: 0 auto 1.5rem;
+      border: none;
+      border-top: 1px solid #333;
+    }
   </style>
 </head>
 <body>
   <h1>Play next...</h1>
+
+  <form class="tz-form" id="tz-form" method="post" action="{{ url_for('update_timezone') }}">
+    <span>Clock shows: <strong>{{ current_timezone }}</strong></span>
+    <input type="hidden" name="timezone" id="tz-input">
+    <button type="submit">Use my time zone</button>
+  </form>
+  <script>
+    document.getElementById('tz-form').addEventListener('submit', function () {
+      document.getElementById('tz-input').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    });
+  </script>
+
+  <hr>
+
+  <form class="text-form" method="post" action="{{ url_for('play_text') }}">
+    <input type="text" name="text" placeholder="Type a message..." maxlength="{{ max_text_len }}" required autocomplete="off">
+    <button type="submit">Send</button>
+  </form>
+  {% if queued_text %}
+  <p class="confirmation">Queued: “{{ queued_text }}”</p>
+  {% endif %}
+
+  <hr>
+
   <div class="animations">
     {% for name in animations %}
     <form method="post" action="{{ url_for('play', name=name) }}">

@@ -6,6 +6,7 @@ After=local-fs.target
 Type=simple
 WorkingDirectory=/home/pi/matrixdisplay
 Environment=MATRIXDISPLAY_INBOX_DIR=/run/matrixdisplay/inbox
+Environment=MATRIXDISPLAY_SETTINGS_FILE=/run/matrixdisplay/settings.json
 ExecStart=/home/pi/matrixdisplay/.venv/bin/python -m daemon.run
 Restart=on-failure
 RestartSec=2

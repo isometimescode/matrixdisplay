@@ -30,6 +30,15 @@ Use the `adafruit-hat` hardware mapping to match the bonnet's wiring.
   GPIO write speed outruns what the panel can reliably latch on a Pi 3 B+,
   causing visible flicker/ghosting especially at the panel's edges. Fixed
   with `options.gpio_slowdown = 2` in `daemon/matrix.py`.
+- **The refresh thread needs a dedicated CPU core, or system load causes
+  flicker.** Without it, the kernel scheduler can preempt the library's
+  real-time pixel-refresh thread under load (an `scp` transfer, an SSH
+  session, etc.), missing its timing deadline. Fixed by adding
+  `isolcpus=3` to `/boot/firmware/cmdline.txt` and rebooting, dedicating
+  one of the Pi 3's 4 cores to it -- this is a boot-config change on the
+  Pi itself, not something in this repo. The library detects the
+  isolated core itself; its startup log stops suggesting this flag once
+  it's set.
 - **Killing the driver process mid-frame freezes the panel** on a
   half-drawn frame, since its refresh thread dies with it. `daemon/run.py`
   clears the canvas on `SIGTERM`/`SIGINT` -- don't `kill -9` it, use a
